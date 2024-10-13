@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB Resistor Information Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --primary-color: #3b82f6;
+            --secondary-color: #1e293b;
+            --accent-color: #f472b6;
+            --box-bg-color: rgba(30, 41, 59, 0.8);
+            --box-border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        #resistorSelector {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            background-color: var(--box-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+        }
+
+        .bento-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            background-color: var(--box-bg-color);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .bento-box {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bento-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .bento-box h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .bento-box p, .bento-box ul {
+            margin: 0;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .bento-box ul {
+            padding-left: 1.25rem;
+        }
+
+        .bento-box.large {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .datasheet-link {
+            display: inline-block;
+            margin-top: 0.75rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .datasheet-link:hover {
+            color: var(--accent-color);
+        }
+
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .bento-container {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                padding: 2rem;
+            }
+
+            .bento-box.large {
+                grid-column: 1 / -1;
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .bento-box {
+                padding: 1.5rem;
+            }
+
+            .bento-box h3 {
+                font-size: 1.2rem;
+            }
+
+            .bento-box p, .bento-box ul {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-background" id="starsContainer"></div>
+    <div class="container">
+        <h1>Resistor</h1>
+        <select id="resistorSelector">
+            <option value="">Select a Resistor Type</option>
+            <option value="cermet">Cermet Trimmers</option>
+            <option value="aluminum">Aluminum Clad Wirewound Resistors</option>
+            <option value="bulkMetal">Bulk Metal Foil Precision Resistors</option>
+            <option value="carbonFilm">Carbon Film Resistors</option>
+            <option value="melf">MELF Resistors</option>
+            <option value="metal">Metal Film Resistors</option>
+            <option value="Thinfilm">Thin Film Resistors</option>
+            <option value="Thickfilm">Thick Film Resistors</option>
+            <option value="Shunt">Shunt Resistors</option>
+            <option value="Precision">Precision Resistors</option>
+        </select>
+        <div id="resistorInfo" class="bento-container" style="display: none;">
+            <div class="bento-box large">
+                <div>
+                    <h3>Overview & Technical Specifications</h3>
+                    <p id="description"></p>
+                    <ul id="specifications"></ul>
+                </div>
+                <div class="image-container" id="componentImage"></div>
+            </div>
+            <div class="bento-box">
+                <h3>Applications</h3>
+                <p id="applications"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Users</h3>
+                <p id="users"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Advantages</h3>
+                <p id="advantages"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Military/Aerospace Standards</h3>
+                <p id="militaryAerospaceStandards"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Resources</h3>
+                <p>For detailed specifications, please refer to the datasheet:</p>
+                <a href="#" id="datasheetLink" class="datasheet-link" target="_blank" rel="noopener noreferrer">View Datasheet</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        const resistorData = {
+            cermet: {
+                description: "Cermet trimmers are adjustable resistors used for fine-tuning circuits. They are made from a combination of ceramic and metallic materials, offering good thermal stability and reliability.",
+                applications: "These are used in precision equipment like test instruments, audio circuits, and medical devices where fine-tuning is required.",
+                users: "Used in industries requiring accurate calibration, including telecommunications, aerospace, and audio equipment manufacturers.",
+                specifications: [
+                    "Resistance Range: 10 Ω to 2 MΩ",
+                    "Power Rating: 0.5 W to 1 W",
+                    "Temperature Coefficient: ±100 ppm/°C",
+                    "Operating Temperature: -55°C to +125°C",
+                    "Adjustment Turns: Single turn (6.35mm/11.0mm) or multi-turn (7mm)",
+                    "Tolerance: ±10% to ±20%"
+                ],
+                advantages: "High precision, stability, and small form factor.",
+                militaryAerospaceStandards: "Meets MIL-PRF-22097 for cermet trimming potentiometers.",
+                datasheet: "https://drive.google.com/file/d/1GcGuF-Ta0rBwv4uoQDaslaMO6MCJB-tw/view",
+                image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxITEBUSEhIVFRUWFRUPEBUVDxUPFRUPFRUWFhUVFRUYHSggGBomGxYVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGy0lICUtLS0tNTAtLS0tKy0tLS0tLS0rLS0tLS0rMi0tLS0tLS8tLS0tLS4tLS0tLS0tLS8tLf/AABEIANUA7QMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAABAAIDBAYFBwj/xAA/EAACAQMCBAMEBwcEAAcAAAABAgADBBEFIRIxQVEGImETcYGRFDJCUqGx0QcjYnLB8PEVJDPhNENTVIKS0v/EABoBAQADAQEBAAAAAAAAAAAAAAABAwQCBQb/xAAtEQACAwACAgEBBgYDAAAAAAAAAQIDEQQhEjFBBRMiMmGBoVFxkbHw8RQj4f/aAAwDAQACEQMRAD8A9jAxHcR7xxEbiABooooBInKNaOWLEAjxFHkRuIAIMQxGAMKwFI8CP4YBWNOOWnJuGO4YA1FkgECiPEAIEOIhFmALMzniHWkpUzXccSI3Bb0x9a4uvshe4BB+IJ6To6pdr5kLcKKpqXNTOBTo7nGejEA+4b9pmdEoteVxeVV4aFPKWFEjYJy9qw+8wHwBxK5NvpEoueFNKqIGurnBua/nqH7idKa9gBO27RzvI50lixAAk1NYxBLCrJAVEkWBVjwJJARHYgAkN3WKgBQC7bIDyz3PoIBDf3QAK8XDhS9V/wD06QBJYnocA4+cxPDc6jmpQqvbW1M+ztuFuA1U2zVbuDgYHb1Mg1GlWvLo2FKoTb03FTUa3L21XmaW3TYAgbdO83FJFpqEQBVUYUDbAlOfae/R0+i2Y3MkMjIlxyKCHEIEAQjgY0wiAIxuZIYwiACKLEIEASiGKECACOEWI5RAEohEMUkCla+uCoAQcTt5aa+vUn+Ecz/3HXdytNC7nCjr69AB1JmR13VqhK0KB/3d0ucjf6NZ989G/M56LOJPESilcob25NpTbNrRfjvqv/uLoYJp56qpAyPQDpNkAFUKowAMAdAJT0fTKdrRWjTGAo3PVm6sT1zLLGRGOBgJhVYFEnRZ0QORZKoiQRwkgcBHAQCFmAG59T6DvAIrm4VFLN8huSScBQOpJ2mK8R6jXap9Etm/3VYfvnGStrbfdBH2zt+J5ATqeItZ9iq1QvHVc+zsaP3nPOq46AA/Aepg8OaN9HRnc8VeqTUrueZdtyPQDlj0lT2Tw69FvSNNS1orRpjYDc9WbqTJ2aF2gAlhBdJihxEJJAQISIhDmAMYRRwiMAYTFmHEGIA5RCRCsJEAjkgjcQgwB8qVtSpLsXHw3/KYzxrr9dg1O1qKgGxOcM7dgcYxMJod/esx+kMSM7I6Khx3DKAcfOTqi8kmIwlbBulxbXxp7fR1Kk3Jx8dvzllqgxkkY752nnVmlOouUZlYDJXiJI/USGvqrofZlufI/wBN+UuVSl+FnmW82dHV0cZB418SsKnHhvKCtnTIwHc7GsR1PQenvmg8C6A9vSNWuQ1zWAeqcfUHSmD+c5vh3Slq3CVqwDGmGemueIBtuH5ZJm0dpTOtRmaeLbKyHnLoTtI8RSWmsg1BprLCLGoslAgDQM/1kqiBRHQAzi61qVNEepVbFCl9fqatXpSUdd+nU4HQyxqt4BlA4TC8daoTtSpd/wCY8h85idEpvqNx9IqLw2VAlLKmRj2rDb2zd+uPQ+srlLekdYdjQLKpVqG+uRiq4Io0ycilRzso9e56nM7rvDUaRbzqMfFYQwyZUjaaywFkkD8xwG8BEdiSAgSNo5mkbNAHJATCp2jSYAeKFRAgkqiAECAxGCANJnI8S33s6JAOGbyg9h1P9951XM8z8d6nWeofZbqnlUbEnHM4PrLKoeUsKORPxg+8Zx76vk/lOzSqoaKh+HkNm746TDWWscTlaylQv1mAOAP4l5j4SzcXYc8SsCv2SDkYm62nVjPnISt403PPYfFF41FeOkeJQfNgnip9iSDuPWcTTvFbO3DcMMnZKmMZ7K3r2M6FSt+nwmQ1vSQoLUs4G5TOcDuv6TK6ZVPygz148+HNq+w5Ee/hnsPg/W8VVBOx8p36Haeikz568D6qatRF+2CAfXpxfEz6Fpic2tSeo74MJ1xdc/hj0EmVYkSTKspN4VEdCIQIJEJDdViuAoy7bIPzY9lHX4DrFd3K00LscAfn2HrMjr+rVWYW1qwN1WH72opDLa23YHlxnp65PQCczlgRS1mgb64+hU2P0am3HfVRzr187089hjfHu6TXJTVFCIMKoCqByAEr6TpyW1FaNMbDmerN1JkzmRGOfzJbFHokCrLCJOiAosmAiVY6SBYiYwkyJjAGvCFiSSAwBnDBiSEwAQBLHZjYoAcxrNCTKl9dCmhZv8noBBDaS1nP8Raj7Onwg+Zth6DqZ57VDVG4V/wO8reKUva1QvQr5c8kyUHoBzXHvkmi6q1FQt4nBUwONwuBn1Hb1G01Vvw9rs8TlxfKacJJpf1G+ItOpex4SPNjCtnDD49vSecXKVLZ8g5U9eQb3joZ6D4gvldvKwZcZUgg59ciZPUsMCDymtTajhjqtascGvu+sKSX4dcg+8djIWuSTgTjIHStwDkdvhnnNdoGlpxgvvg/2JR54uz0HxoxeR+fX/pov2XeFeCubhh5Rugx9o9B6A7/ACnsdAzKaM4AUAYA2AmntTymJ+z1Y7i06KSQCczV9Xo2lBq9ZgqKPiT0UdzPPn/aTTuGCpV9mTgLTcNS+HGRg/OSsbzSLHKEHNRbz+C09XAgcgDJOANyfSYOj9J+txD3cR/OMravVA4KuRnYHORmXLjs89/U4JdxaKvjPxKwwwVjxZS2XHPoahHffadzwfoptqHFUya1X95WJ5gncJ8BgTkeHbBXuFqVAG4Sz0gd8NjY/mZsajSq2CUsNHDnKyH2kvkaTEogk9NZWbB9NZMogUSQCSAiAtE0bAExjYmMKiALGIAd45uUbACYA0eRGYgDhDmNkF1crTUs5wB/eBBDeex1zcKilnIVRzJOJjdXv3rOOHlvwDOcD7xx1jdW1Bq78JG32FzsB95vWdTQglMYqKCO+N/iP0lsdg9aPPssjyE4JtL+5zbKwCDJ3J6kTP8AjKpTemabDJOwIOGXbmCNxNl4jRadM1FdeE7KM+YnsuOc8i1rUwM1HO2ZdFqfZ5/IjKjK4LtmMY1bKpjJakx+B/8Ay06VW7DqCpzxcorq4p1qZ6qfz6GcbTQ1MupB5eTtknn8oX3X16NCirY+Ulk17/Mt18cQUDJ+0fU9JrvDtHYTgaNppZskevxnoOjWHKV2S000x7NJpAO01VmJxNNoYAj/ABPraWdo9VjgkezpjmTUblgdcDJ+EqUW3iNjeLTIeM9cFzcFAA1KkSigqGDOPrNv8pmX0ShUdcKKLZGGQeXOdspnHyxItP1Ci+FDb9m8p/7nSaky+bl1E9B8dePjJHzD+ocmm5zjJxe/odZdZq2rBG+rzG5KMP4dtjJL/wAR0bil+6YE5HGuclPf6HvM5e1PaKUqeZTzDb/Edj6iYnVLapbMHpuxH2XGzL/C45EfgZnanTLV2j13fR9RqcGvGz9meraNqxSou/UY9PSek0anEoYciAfnPn7RdZFZQeTDAcZ69x6Ge6eFyTa0ifu/hkyOQ1LJIr+mRsqcqp/B1aayyiwIklUTMeuELCYoCYJETBiKGARhY9jsYZGsAKQsYBFiAOzGwGGAQ3lytNC7HAUZP6D1nn+p+Iva1eEggnZRnPADnBIxudjOn441XhYUgeQDt7zy/D85g6uoEvxZyQcjPQ+h6SxVTlHYvGebyebXCfhNNr5NxpmnOqcbKTnctjI+cs3NyEGfT8ZBo/jGmEVXIBwO59Nx/fKcDxnrVEAmm+Mgk9judxjkP0mdWyUvGxYWumt1edD1I42s6xUcsqsQucfETDXtUtmnW5cwZ3TWB3zn8Zzr2gKjD03J9Os3qGLUePVdOUsn+n5fyOda2yoP4Ry9TL1lZGo3EfdjsOkfRt/aNsPKOQ9PWa7R9Nx0nEp50ehVW5S2Q7RtMxjb8Jr9Ps8Y2ken2eJ3bahiUtm+KxBpgIpZjgAZJO2ABuZhdf1E3VXYH2a5WkuM5zzYjuZU/aH4juy3srOkr0U/5mJDF3zyVQwPCPTmZX8E6ulXzXFM0mzwjOSmc43zup26y+nIvZe/g8v6g7L4qFLXj84+/wChMfBNOqvGw9meYAXAP8y7fhM3q2o1rep7J1JRdlyxb/6OenoZ6nqt2qITnpkY3z7p5pq9QODxb57zfC9tfe9GBtVtVy+8iq18rrxKdvyPYyhdVwwIO4PMTPXdd6NTbdT+I/WX9OpvWYcPKZ5WpvEbFwlBKSfXwSeFNKc3yKgJUnh7gqTjHwOD8J9MaZQCU0QfZUL+s888FaYlLDYyw5emefxnolmdphlmvD2K9aTkuzorHgyNY8TksHGDEIigkWIIcwQBgMKwAbwwBAx2do0iNEAMRMGZG7wDyv8AaO5W6f8AiCsPdw4/pMUtc5npv7S7APSFUc08rfynl/frPKztNVXcTwObXlr357Ln0icvW6lTh46ZyR0O+RzOBLHtZWr1BJnFSWMo47lXPYlLSbhgvETlTyHLDE749J17akWT+Y4/+P8AmcyzsmrVVUD92PM2NsYO/vzNtZWAJ2Gw2EojNrUel/x1Nqz+IdI03lt+E1+n2XpItNsvSaG0tpy2bYxwfbW+BOP4s1f2a+wpnzsPOfuoeg9TL+s6sKKlUwapHlGMhT95v0mb0TSTVctWqMeJsu3Q+mDnHwltdb/E10YeXyU9orklJ/sc3SrM1HAx5Ruf0na1e3omn5sKeQZcAj0PcTU1NAWlTzTII54/Q9Z5t4mviahXoDv75oclYeYqZ8OOv2zD6lr13bVTTdvaUCcpjOOH+An6v8sdcagrqGU5B/vEk1bhqKUbkfwPcTK2XkrcDN5cnPbbkZS24vPg3VwjyI+bWSX7ouVrf2gLMcKM4Pu7TueFgfKoAAE4RJquAuyjZR/UzfeGNMxjacyeI1wT6T/0bjw9RO3uE2tnT2nC0K2x+E1FFMCUG5D1EdDFBIIo6CAKCGCAAwKIsQuYAmMjJhgIgDGMrVnlh5QvKgVSzHAAJYnoBBBwvEz8VB0AyzjgQd2P6c55JeU+FivUEqfeOc9K8VaktCiuVLXdxtb0gcNSt87uw6Ejv1IHSYe5sPZoS2C7buee/YS2m7xTR5/M4ztmmn6OKQI00QeoHxnOun83rnEuaXakkGWOwxw4z3NO7pNqBso58/WbDTLTlOXo9rymu063mdy1nrV1qKxFuytpnNX8aL7RqNvkqp4alVSPrfdTvvtL3jPU/Y0BSU+erlfdTH1j8c4+cwNNaYHCFCjn5QAeL0M4n5pbEqt5FcZfZyNxY6E9Rfa+YIeuCS3ck5mgt6AQAYwBykPhPxCooLTqYGBhTzBOftS/rhp+yNRGAIGSAwII7rO6uc+o2dGeX0ytbZT2cXV/EjUBwqc5+z/fKeU+INYzWJOfMcknJ3PrOxqd2XYsefTPbfaZfWU4l9d8e/E12RS7iebVyJWvws/D/Yq3BLNwj5znXVAO4VB9XOSBzJl+nSZKSrnLuPks7ehaNyJG8rclh6NUHGWL/PzFoGi8iRPQ9GsMAbSDStNG01en2eJTJ6b4Qwv6bSxOuplS3pS0gnJaSCHMQERgkGYYMRZgCMQihgA6SMxZggBSEiKnzjmgEFQTO67qVKlSa5rHNCkf3aDncXI+qo7qDn3kem/U1KuDxU+LgRV47mrnHs6WOQP3yPkN+2cha0zqFdbhl4bShlLKkRgNjYVCPcPkZXJ70iShp+n1Xd767ANxW3A6UqWPLTX0H9TObrVDOZuLxJw7qzz0na6OGjzQ6QxfM0Gl6RjG00dLShnlOpa2GOknStQSK+mWWJorWjgRltbgS8gkFmHnX7Sci5TsaI4fQh2J/pMga3eeh/tJteKnTqjmhKH+VuX4zzhwJtqj5Vnz/Pj/AN70tpqdRdgTgcsSO61asUwHOdtmYlSB0I5DbO8pvKldscpROiL9oU3WRa8ZMo6ZrFU1mpVAccTcIO/s/wCH+WdML7R8dOZ905FQ8LOwGWcKgGORHUH5TU6PpZWknF9dweIZzgZ/xOY2eLcH+husoVrVkV38isNO434iPdtyXoJtNL07AG0j0rT9htNVZWeMSGzZCtIksLTE7ltQkNtSxOjSWcl6Q9UjwIhATBI7MbmKAmAOjTFmKAKGARwgEOYgN4JIOcAKCUtWvSgCUxxVqhK0VPLPV27Iucn4d5Pc3K01LNnoABuWYnCqo6knAmD8UXNerVNjQ2uq6qbuqp2tbTP/ABIw5Mf1PacTlnRKRFcVv9QrGyoMxtKLcd7Xz/4m4zuuR0yPd05Ca32SqoVQAqgKoHQCN0nTKdtQWhSUBUGB6nuZI8RjhBRrJIhbS+KUlWjOgUEtJZpW8trSjwkEYQBMRrmWWWUL+sEUscnkABzZjsqj1J2gGe8XvxUGTmT5h6BTxEnsNp5c5GdjN1401Nk/2FLha8r4a5qDzLbUNyKa+uB+JMx2oaWtGmEUkkc3J3J/SaKb/FYzzebxHZLziyk9PMqtbEymL1x1/rH07yoxwDj3DMtlYmYY0WL0dLTtP4XV26HIHczZ6Za8R4jzP4Tg6HZ8id998zfaPactplnLyZ6/HrcI42dHTbKdujQxBaUcCXUE5NKQaVOWkWRpJYJCY2IxCAAxpj42AICOiEOIA2GCGAMIjjEROB4j1Wmq1FcZpUl47s9+XBbr3ZyRkdtus5k8WhLTna54hZQKtNON6h9lptM/bcjzXLdkAO3pn70teFdB+i0SXY1K9QmpcVCSS1Rjkgdh6TmeENOrVaz6ndrw1KqhbelzFC3H1VHr39Zq6jTmK+WSyNzIwsfiSKk7IGokmWnHoklVYBGEh4ZLwwESQVauwydgNyegExnizXWt1p1VTjr1Saen0jzG2GuHHTbl2B7nE0GualSp03q1Ti3onNTG5rV8+Wig674zjmcDoZm/D+n1a1V9RvBitUytCnnIoWwPkRR0PUnqZw+3hPooaTof0emWqHjr1PPXqHclzzGT0nB12iSDN9epmZ+8seI8p0ujiS08suLB+I4HWdTSdIOdxNkujb8p07PSwOk7cuilVJPSnpGnYxtNjptvgCQWVlidq3pYnBckTIJKkQSOCSTokUyUSFRJQIAjBCYoA0mECOAigBAiaLMBgDYoojAKWq3vAFRd6lQ8NIdvvO3ZVGSfdjrMJZUv9Qu1CBhYWrsSSd7u8yeKo2PrDizz/SS+JbytVr/QqBP0qtw/Tai8rWyOSKKHoxGfmT2mvsrOnQpLSpjCIAB+p9ZV+J/kS+idz290jMWY9ElhAUWTIsSJJVWAJRHgQgQ4kgBE5+pXB/40YKxBd3OMUqI+tUOevQevulm9uvZrnHExPDTUc2c8gPzJ6AEzC6wWvK76fTclAQ+rVhkcTbcNqn8ODv6YHMmcSfwiUQ2NL/Uq6VuVhbkrZ09/3zj/AM5++/L/ALmpuPT+xJ6dJUQIgwqjCgbbCQvEVhBQqU8yI2k6S0pKtCdA5a2Q7Szb2kvijJkpQQQ0aEuU0jqaSYLJJGgRYjiIhAEojiYoIAoRFBmAOJjCYTEBACIjFEYAojBFAMn4L0sUrYVSxqVa/wC+rVWHmZj0907bneCKcpYgFBLCLBFJBOBJFEUUkDooooBjfGOsVKNpUuEx7Rqy2FEnf2IeoKbVAPtNuT06D33vD+lpbW6omTkcbud2eo27Mx6kkkxRSuPvSS253jVWKKdkE6oJKqQxSQOCx4WKKASJHsYooA2OWKKAIxCKKAAwRRQBwiiigAiiigAigigH/9k="
+            },
+            aluminum: {
+                description: "Wirewound resistors encased in an aluminum housing for superior heat dissipation. They use a wire (usually nickel-chromium alloy) wound around a core.",
+                applications: "Power electronics, motor controls, RF circuits, and power supply units, where high wattage and heat dissipation are crucial.",
+                users: "Heavy industries, motor manufacturing, and RF communication companies.",
+                specifications: [
+                    "Resistance Range: 0.1 Ω to 100 kΩ",
+                    "Power Rating: 10 W to 300 W",
+                    "Temperature Coefficient: ±20 ppm/°C to ±100 ppm/°C",
+                    "Operating Temperature: -55°C to +250°C",
+                    "Tolerance: ±1% to ±5%",
+                    "Inductance: 0.1 µH to 1 mH"
+                ],
+                advantages: "High power handling, excellent heat dissipation.",
+                militaryAerospaceStandards: "Complies with MIL-PRF-18546 for wirewound power resistors.",
+                datasheet: "https://drive.google.com/file/d/1DbP0EOA5BFG9e8AyPBMJtGfL0JF54a_a/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            bulkMetal: {
+                description: "These resistors use a metal foil as the resistive element, offering extremely low temperature coefficients and long-term stability. They provide the highest precision available in resistors.",
+                applications: "High-precision applications such as aerospace, medical instruments, and high-end audio systems.",
+                users: "Aerospace companies, precision measurement instrument manufacturers, and audiophiles.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 1 MΩ",
+                    "Tolerance: Down to ±0.001%",
+                    "Temperature Coefficient: As low as ±0.2 ppm/°C",
+                    "Power Rating: 0.1 W to 1 W",
+                    "Long-term Stability: < 5 ppm/year",
+                    "Load Life Stability: ±0.005% after 2000 hours at rated power"
+                ],
+                advantages: "Ultra-low temperature coefficient, long-term stability, and accuracy.",
+                militaryAerospaceStandards: "Meets MIL-PRF-55342 for high-precision chip resistors.",
+                datasheet: "https://drive.google.com/file/d/1bj3zoHagwkStuFbqHM_2REmzEBTCYite/view",
+                image: "https://res.cloudinary.com/rsc/image/upload/b_rgb:FFFFFF,c_pad,dpr_1.0,f_auto,q_auto,w_700/c_pad,w_700/F7637227-01"
+            },
+            carbonFilm: {
+                description: "These resistors are made by depositing a thin layer of carbon onto a ceramic substrate. They are cheap and widely used.",
+                applications: "General-purpose electronic devices, automotive, consumer electronics, and power supplies.",
+                users: "Electronics manufacturers, automotive suppliers.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: ±5% to ±20%",
+                    "Temperature Coefficient: ±350 ppm/°C to ±500 ppm/°C",
+                    "Power Rating: 0.25 W to 2 W",
+                    "Operating Temperature: -55°C to +155°C",
+                    "Voltage Coefficient: -200 ppm/V"
+                ],
+                advantages: "Low cost, widely available, suitable for general use.",
+                militaryAerospaceStandards: "Some variants meet MIL-PRF-39017 for fixed film resistors.",
+                datasheet: "https://drive.google.com/file/d/1am4OASOxCr2k2HEakxyjntF2n5gI6y7d/view",
+                image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMQEhAQEBAQFRUXFRUQDxcQFRUVFRUVFRYWFhcVFRUYHSggGBomGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGi4dHyYtLS0tLS4uLS8tLS0yLS0tLS8vLSstLS0tLS0tLS0tLS0wLS0tLS0tKy0tLSstLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAcAAEAAQUBAQAAAAAAAAAAAAAABgECBAUHAwj/xAA+EAACAQIEAwUFBgUEAQUAAAABAgADEQQFEiEGMYETIkFRcTJhgpGhI0Jyg6KxB1KSo8EUM2LxshUk0eHw/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAECBQQD/8QAIxEBAQADAAIDAQEBAAMAAAAAAAECAxEEEiExQVETcSJhgf/aAAwDAQACEQMRAD8A7hERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREXgIi8XgIloeXQERF4CJQmAYFYiICIvKXgViUvKwEREBEoTAMCsREBERAREQEREBERAsqjYzFtMuryMxZMVqlpg46ncTPnhiFuJPENDw7WCVq1DugajUQDnard+X41xBv75JysjBbs8RSa3tBqfLxUdqp/pSqv5kk95XFNWy1hL5QiWQ1mMpggggEEEH3g+E8+FsRen2ZJ1J3GvzvTJpE9ez1/GJmYpJrMr+zxFQeD6ao9SBTf606P8AXK1MSKJUykuqteYOKWZ5mNiFkWLNdw++h61HbZtafgq3qD9Yrj0UTemRuq3Z1qNQfevRb1Pfp/qQp+bJIrXAMiChnjVE9jPN5YarM8P2lOog2JU6T5MN1bowB6TMyTECpSRxsGAa3lqAbT0vbpLK0xMgbQ1el4LUZl/DU+0AHxNVHwyv6mN6YMRLIeFcS/ACy9TFQS7CDbqZWpj3iIkJIiICIiBbU5GYsyn5GYzSYrkpLHEvlrSUI/nSkKWUboVrKPM02D6eoXT1m9wT6kXe/gD5jwPUWPWYWNSePDFSydlfdCaXoKey/wBvsT8Ur+n43UtlxlsuPGuNposw7j0ag8H7I/m2VP7oonpJC4mozPD61dQbFlIB8j4EehsekrlPhMbujUDKrDxAI6y6a/JMT2lJWta4DW8tQDW6X0/CZsJMvwE8aonrLWEmjR5thy6Mq2De1TJ8KinUh6MFPSbfK8SKtJHXYMqso8gwuB0Bt0mJjFmPw82k1ad/Zc2HjoqXqKR7tRqr8Ep+pbyWOJeTLTLoYdZZrW+zrq45Ohpt60yai/oNf5ibeqt5z7H8SDE1eyUAUw/dP3idxe/gN+Xvnhv2zXO166tV2XkdKQysgGLz+phGR2qtoJsRUPdPpq/xJ5hqwqIrryYBh6EXkad82d4tt03Xzq8iXURYShl1I7dZ7V4xfERISREQEREDzxDWUmeDSmcYgUqNSo3sqLv7kuNZ6Lc9JZh2JUX58m9RsfrJlVyXyhErEshh4pdjNXgG7PEMPBwr9VIpv89VD+mbmss0eOGlqb8rOFb8NT7O/oC6t8MpkmJKZbKUWuoPu+Xul1pYWsJg4pZnzGxK7RRrciqaXq0/JiV/DUvUU/1muPgE395FqlYUqyOSAGUob+aXqL+kVh8Ukwlcb+JsXy1olby/UMTEptI5VzJKOIBFmJXTUCm7DSwKk+gaqLf8pvc+qMmHrsmzCm5QjwIU7iccyHNx24XVdibMTcgXPM+c4vL35a+esdfjaJs7a7HgM8o1m7NSwbycaSfTzmytOUcQV6lGpSq0u9yNxdbWN+s6lSralVvMA/MXjxfIu2X2+4jydE12ev6truAN5wbMcFUoY1h2jAK2qlpNri/dJna8zfYzk3F7Fai1D4GxPujzMbcOz7X8PLmfP63WZZetagjtZiAD3gDsecnvCFQf6TDqLd1NG3hp2tOdcP5ka9Bkp02a11u3dBvvsTzG8kX8OMbUIr0aqaSrB1swYEHZvqPrOTw767Of2OzzNOX+dt/E5ZpfhuXUzyYz1w3LrNZkPaIiQEREBERAw83phqNVSLgqQQfEHYgzWcPVi1FATcgaWP8AyQmm/wA3Rj1m2zEfZv6SP5I+mpVTwutUeVqg0kD0alf82R+oreykrKS6qxxNPmdAOroeTAqeotN001eaVFpozuwVRuSeQkZfSZGVlWIL01Y8yAx9T7X6tQ6TMkKynPWBqGmAyXOgMdJFzqPgfEseskGTZ0uILLbS67kXvceYM8cN+GV5K9s9GeM7Y2t551FvL5j4yvpBM97Xi5tmXEfbViuy01fYeJsbXJ85nZnmTYUU6wdwCdzqLA+o3kGz3LwuMY3OnUWQX2Fz+8mIodthlPMgXF99x4TC255+9+flta8MfSfHw6LlmLFelTrLydQ231+t5ksZoOCawOGRP5CV+t/8zfPNnVl7YTJk7MfXKxp88rEIw9046KQpV2sLAnUPW/8A9Tsea07gzkfFtB6bqUAuSRc8hfxM5vN1++Dq8LL/AM/X+pZjrVKCtbkAf/mTDhnF9rh6R8QNJ9V2nOcgwhrUGSrWqMdx3bKLHyA6ySfw4HYithtTGzCooc3tfZgPdsPnOTxM+bP+x2ebqx/z7L2ypRjluDOc8Z4AOjC1/Ee8jcTpuKXYyIcRYe4baamePZxla8vXKVCOGs+pUGCVKgBYWCi7MfIBRvN/kOcinmCKaOJRanc1vTsh17jcG47wG5AkNySguGrNYd7Vcsd2IO+5/wASZ55WRBTqmpTUi1tTKN+Y5nzmRjccMvidsrWuOWyf9dRA2nrhxtMPK8UK1KnUUghlDAjcbiZ1PlNmXs6x7OXi+IiEEREBERA8Mb7Deki2rRVpnz1Uj8VmX9aIPikrxQ7jek5XmvEPa1jSUAIrgX+8SrXDA+AuJ5bds149q+vVlsy5HSUa4BG8ukHxmPq4NadXW4S4XTUJK+gvJjgcUtanTqpydQw6xq8jHZbInbpuE79vcyF/xOZv9MCt+64ZwPKzW+v7yY1GtIdxgS1Nl5gjcS+3H2xsV13mUqH8G493YhkUA7gXJO3n75uskSpRzBGLnSxIK2FrMCBaRXJq4o1Ab2AIJv5f9STZ7mVOn2VYVFBUgi2/v5j0mJjl65d/lbd13PHkn3HTrzXZkLgzIy/FLWpU6qEEOodSN9iLymLS4m5L2MKzl5XIeL6fZsXJsAQSfp/kTM4SzN6isiU9uYNQ2Bv5Ab/9zZ8Y4HWrAiRDh/O1oVVSzu57pSmpYi/ibbL1MzPK13/SWTvWt4m3Ga+VO+AMTWp4ivQrCmARqQoTzU8iD7t50Bpymvm1TD4qhX/0tYIWAcg0zYHYkqGvax8L8p1VWuLidXiW+nrfxy+bZln7Sc6w8XTuDOccc4eyM/kC3Ly35dJ06su0iHE+FurTo2YzKcrm15euUrn/AApjcSz6UFOkhHOp33PkQo2HUmSPJEr4bMEZ8QHRyUZTSCbOLCzKf5gOd5FMBiuwq6VVnYG4C22B/mY7DYyUZu9c6Kqrh102IBqMWvsRuEt4THmVwvxJOVsf4+8+b9z+un1BcTRZvRuDNnk+NGIopVHiO8PJhzHzlmPp7GbMvZ2MWyy8rjGfYa2IALFQRuF2Lb/zcwPSbjDY+ilIIKaDu23AJv4bneX8ZYEEq97Fb7jnY+Ej+Fpdqwp0++xvYeJsC37AzK8jXn73jV0bp6Sd+nTv4a5l2gq0drLZ0t4ar3HzF+pk6SQjgLBLQQkbs9tR9OQHu3Mm6cpo6MbjrkrO3ZTLO2LoiJ6vIiIgIiIHhjn003PkLz59zjClca3fYKG1oAbA3JNzO/Zt/s1fwmcO4rTRU7Q7WO5PkZy+Xjbr+HT4mXNnP6lGYs2Kww1sWAANjy290knA1T/2qIPullt5b3/zITwrmva03RKbMByJ7qm/lN3wBjai1q+Hq09H30swYGxsRty2sZyeLfXZO/s47fK0Zf5X84nNUbSO53h9QMkbTWZhSuDNWsj6cVzbA2xHeuV8F5AnzPntaTfBoKuF0qBsLbDxWR/jbDspDIBfUNzyUciT5zJ4ToLUVkqlql9++Tb32UbD5TJ8jDmz5v22dO7LLVP/AEnfAeKDYfs/GmxXodx+5khqic94HwlPB4urSppoFQG4UmxKm4NibXsTvOiPO/xsplrkn58M7ycbjsvf+orxDh7qZy7DURh6rgbDVrJO1yeZJ9bzsuZ0bgzkvFmDUV01rcbkA+yTtzHjPPzMe63r4eU9+Vv8yzWhUoK6uXIsfslZ7Hkd1En/AApmC4jDUqim/d0tcEEFdiCDuDOYYPPOzp9mFFrWUDa3SSf+GmYFqlanvpK69/MED9j9JzeLnJs+J9uny8cbr+PxPXE0mcULg+k3zia7MKdxNWslxbNqbUsQ4ANibi0tbFO22o9Teb3i7BVNWpP/AMJicO5Z2wrCoCHASpStfkHCVARyP+4h+E++Zmzxe59jRw8qTD5dA/h5SZMNZ+bOWA9xAH+DJBiqd5g5BQ0IB0m1cXmjhj64yODPL2y6hHEOVdoCJFcuyR8PUFZBdkPaID4lDqA62t1nVMRhwZrnwdje0ZY9Jk98jpqBdLaT3kt/Ke8p6qVPWSGkdpG+G206qJ+4TTX8K2ZP7dSkPhMklPlJn0ir4iICIiAiIgY2Yj7Kp6TkfG2BDo21/vdRuP2nXsb/ALb+k5/xLhrq0rnOyxbDL1ylQvhrOaVF1Wo4BYWVRuxPhZRv5zdJnIo46i3ZYkKxClmpNps3d3Ph4byJZBhlw1Vmt3g12c+0R7z4Cx5SWZ9mtArTYVVJ8NN28L/dBmRLjheSW8rW9c9n/wBdSvcTFxIvLMlxi16FKqjBlZQQQbgzJqrNmXs6x7OXjn/FuE1K3UH0kN4dqVRUW9TskuQbAFyOW5Oy9J0/PcPqUzlT0Xp1HH/IkH3GcHmY34sjv8LZzsSmqi0K9PEpWrMwN7M5sdtwV5WPpOn4PELWppUX2WUMOs4ZRLOwUE7zs/C1Ls8NRpk3KrY+puf8x4Vztvfo86y8/r2xibGc440woIDFb2N50+st5Hs4ysVAbiduWPtOVw4Zet65VllHt6qUqezNcLq5XsSBf3kW9SJ0fgPDGmLlQCec0n/oPZEvTA1qe0p/jQ6l+oEnOSBWUOnsmzp+FwHT9LLPHVpxwy7Hts35ZzjckzHrpee8oVnU5mgzDLQ/MTTnAik9J+QDhG/DWBom/uHaBvgEmNWneanMcGHV0O2oFb+Vxa8rlimVtsGvdU+4TIImBkeK7WmrEWJAYjyLDUw6MWX4ZsTLY/SK8mSYlenM+08KyxwaWm3Z4gHezqPS6NpI6rVB/KkoTlIxm6Cyvy0OGJ8ka9OoelN3PQSR4RiVF+fI+o2P1lEvaIiSkiIgIiIHji/Yb0kTzehcGS7Eey3pI/mFPYwiuM51g1GI+03FhZT7N7ncjxkioZ1TWj2VrWFgANvpMbi3BrqDm4tflNJhUNVhTpd4m+kDmbAk/QH5TK8jXnM7/Gro2y4Sd+nSf4c5j2grUr3AtUXrsZNHEhnAOFFJSR7TW1H3Dw+smjTQ8fG465Kz9+UyztjT5nRuCJzDiPKqmvUl516tTvNRjsuDbkT0yx7HnjlcUH4Xy0FStQfaKy1FPmh7jDoxp/1zp2XU9KgSMHDik9JwPvdk3pV7i/Kp2R6SW4U3VSPEA/OV14zH4ic87l816MJ4VKV5kkS0rPVRp8ThxLOG3tqok7ozIPLSCHS3olVF+AzY4lJpqZ7PEq3g6i/rTbT/AONZm/Klb8JiT2iVEWl0KWmFjUmbMfELeRRrsgYK9Wn5OxX8NT7Ufrat8pvJHNXZ10bkGXSfWmdQ/Q1Y9JI5GP8ACk8qgnrLWEsNbi6IYMrciCp9Dsf3mRw7VLUELG7C6VPxoSj/AKlY9ZTELPbKqQVWt4sWPrYA/tKVMZ0REJIiICIiB51/ZPpNPi0uJuK/sn0muqJJitQjiDKu0BFpG8uydsPUWsLk02FUAczoOojqAR1nTsRhrzXtgwDylbimZcZWT4YLfTbTc6D5re6nqLHrNzNJw1cIEPNNVLzNqZ0IT7+zFI/FN6BLY/RVhE8alOZJlhElDR5nhdaOgNiVIU+TfdPQ2M2OSYrtaYe1rgN6a1D26atPwyzFJ4zFyBirVKfgHYD0Y9sPrVdfy5X6o3ogwBKmWHjWWaDNqYAVzyRwzfgYGnU/tu56SROJq8fRDBlYbEFT6EWMijZ4ZiVUnnazeo2P1ntNXw/iC9IaudrN+IEo/wCtHm0k434KoZ51RPUyx5NQ0WbgKvaH7jLUP4QbVPnTLjrN5g2JQX58m9RsfrNdjaQIIO4IKke47H944crlqYDe0O634lvTb9dNz1lP1LbRKyhl0MesJ65f7HUy2oJ6YMd3qZFWjIiIlUkREBERAsreyfSYBmfW9kzCIkxXJ5OsxK6TOM8KwkqtRgiUxLjwdVqD1/2n+oww6yRiR3GpZ6D8rOaZ9Ko0r/d7E9JIKD6gD5gGVx+1rV1oMrKGWQxsQu01VM6K4P8AMo+dNrf+NVz8E3NUbTTZhYaWPJXGr3I96bnorsekrUpCDFp54ZyVBPO3e9fH63npLQWtMLFLM4zHxC7QNTlFTRWq0/AkOvpUXl6BqTn8ySGRfEjRWouPHVT67VFB9WpBfjMkyNcAyMSqmUMrLWlhh4lZrspfRXqp4EioPSovL+qjUP5k21cbGaHGVeyq0qnmGpm3M2tVH0puPilKmJVLSZRWgy3UKGemGG3UzzM9aA26yKnj1iIkJIiICIiAlNI8hKxApoHkJTsx5D5S6IHm1BTzVfkPDeXKgHICXRAppEaR5SsQLdA8hLXoKRYqp87gT0iBatMDkBK6ZWIFNMoUHkJdEDzNBTzVfMbDmORlwQDYAS6IFNMaZWIFpQeQlrUFPNVPiLgc56RAoFHlFpWIFLQBKxAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQERED//2Q=="
+            },
+            melf: {
+                description: "Metal Electrode Leadless Face (MELF) resistors are surface-mount resistors that offer better stability and lower failure rates compared to traditional chip resistors.",
+                applications: "High-frequency applications such as RF circuits, automotive electronics, and telecommunications.",
+                users: "Automotive industries, telecommunication companies.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: ±0.1% to ±1%",
+                    "Temperature Coefficient: ±25 ppm/°C to ±100 ppm/°C",
+                    "Power Rating: 0.1 W to 1 W",
+                    "Frequency Range: Up to 40 GHz",
+                    "Voltage Rating: Up to 500V"
+                ],
+                advantages: "High stability, better thermal performance.",
+                militaryAerospaceStandards: "Complies with MIL-PRF-55342 for surface mount resistors.",
+                datasheet: "https://drive.google.com/file/d/1Zi9kaLvigfWxfOI3hs9qnbRC1WMdsuhS/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            metal: {
+                description: "These resistors consist of a thin metal film deposited on a substrate, providing high accuracy and stability.",
+                applications: "Signal processing, precision applications.",
+                users: "Electronics manufacturers, measurement instrument makers.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: ±1% to ±5%",
+                    "Temperature Coefficient: ±50 ppm/°C to ±100 ppm/°C, stable performance up to +155°C",
+                    "Power Rating: 0.25 W to 2 W",
+                    "Frequency Range: DC to 1GHz",
+                    "Noise: < -30 dB"
+                ],
+                advantages: "Good stability and reliability, low noise.",
+                militaryAerospaceStandards: "Meets MIL-PRF-55342 for fixed film chip resistors.",
+                datasheet: "https://www.vishay.com/docs/28705/mcx0x0xpro.pdf",
+                image: "data:image/jpeg;base64,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"
+            },
+            Thickfilm: {
+                description: "Thick film resistors are made using a thicker layer of resistive material, commonly used in low-cost applications.",
+                applications: "General purpose, automotive, consumer electronics.",
+                users: "Electronics manufacturers, automotive suppliers.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: ±1% to ±20%",
+                    "Temperature Coefficient: ±100 ppm/°C to ±500 ppm/°C",
+                    "Power Rating: 0.1 W to 2 W",
+                    "Frequency Range: DC to 1 GHz",
+                    "Voltage Rating: Up to 200V"
+                ],
+                advantages: "Cost-effective, widely available.",
+                militaryAerospaceStandards: "Some variants comply with MIL-PRF-32159 for thick film chip resistors.",
+                datasheet: "https://drive.google.com/file/d/1g7nSJFUKzO9xHjiJDHeZC7homB_N3yDg/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            Thinfilm: {
+                description: "Thin film resistors are created by depositing a thin layer of resistive material onto a substrate, offering high precision and stability.",
+                applications: "Precision analog circuits, RF applications.",
+                users: "High-end electronics manufacturers, medical device companies.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: ±0.1% to ±1%",
+                    "Temperature Coefficient: ±10 ppm/°C to ±100 ppm/°C",
+                    "Power Rating: 0.1 W to 1 W",
+                    "Frequency Range: DC to 10 GHz",
+                    "Noise: < -40 dB"
+                ],
+                advantages: "High precision and stability, low noise.",
+                militaryAerospaceStandards: "Meets MIL-PRF-55342 for high-stability chip resistors.",
+                datasheet: "https://drive.google.com/file/d/1OE5JA7B4FN1Ct_9yq5EntZmgA0qYetGo/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            Shunt: {
+                description: "Shunt resistors are low-resistance resistors used to measure current by creating a voltage drop.",
+                applications: "Current sensing in power supplies, automotive applications.",
+                users: "Power supply manufacturers, automotive industries.",
+                specifications: [
+                    "Resistance Range: 0.001 Ω to 1 Ω",
+                    "Tolerance: ±0.5% to ±5%",
+                    "Temperature Coefficient: Typically around ±50 ppm/°C",
+                    "Power Rating: 1 W to 5 W",
+                    "Frequency Range: DC to 1 MHz",
+                    "Inductance: < 10 nH"
+                ],
+                advantages: "Accurate current sensing, low resistance values.",
+                militaryAerospaceStandards: "Some variants comply with MIL-PRF-49465 for current sensing resistors.",
+                datasheet: "https://drive.google.com/file/d/1YZR-vCnZ0-NcahY7m3FuNw2MkBICWQf8/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            Precision: {
+                description: "Precision resistors are designed to have very low tolerance and stable resistance values.",
+                applications: "Calibration, test equipment, medical devices.",
+                users: "Calibration labs, medical equipment manufacturers.",
+                specifications: [
+                    "Resistance Range: 1 Ω to 10 MΩ",
+                    "Tolerance: Down to ±0.01%",
+                    "Temperature Coefficient: As low as ±1 ppm/°C",
+                    "Power Rating: 0.1 W to 1 W",
+                    "Frequency Range: DC to 1 GHz",
+                    "Long-term Stability: < 25 ppm/year"
+                ],
+                advantages: "Extremely high precision, very stable across temperature variations.",
+                militaryAerospaceStandards: "Meets MIL-PRF-55342 for ultra-high precision resistors.",
+                datasheet: "https://drive.google.com/file/d/1_mSTBlRuPjNNzX6BIX2JMm7abH5edyp9/view",
+                image: "data:image/png;base64,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"
+            },
+        };
+
+        const resistorSelector = document.getElementById('resistorSelector');
+        const resistorInfo = document.getElementById('resistorInfo');
+
+        resistorSelector.addEventListener('change', function() {
+            const selectedResistor = resistorSelector.value;
+            if (selectedResistor) {
+                const data = resistorData[selectedResistor];
+                document.getElementById('description').textContent = data.description;
+                document.getElementById('applications').textContent = data.applications;
+                document.getElementById('users').textContent = data.users;
+                document.getElementById('specifications').innerHTML = data.specifications.map(spec => `<li>${spec}</li>`).join('');
+                document.getElementById('advantages').textContent = data.advantages;
+                document.getElementById('militaryAerospaceStandards').textContent = data.militaryAerospaceStandards;
+                document.getElementById('componentImage').innerHTML = `<img src="${data.image}" alt="${selectedResistor} Resistor">`;
+                document.getElementById('datasheetLink').href = data.datasheet;
+                resistorInfo.style.display = 'grid';
+            } else {
+                resistorInfo.style.display = 'none';
+            }
+        });
+
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const starCount = 100;
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = star.style.height = `${Math.random() * 3}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                fragment.appendChild(star);
+            }
+
+            starsContainer.appendChild(fragment);
+        }
+
+        createStars();
+    </script>
+</body>
+</html>

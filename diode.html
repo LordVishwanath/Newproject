@@ -1,0 +1,354 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PCB Diode Information Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --primary-color: #3b82f6;
+            --secondary-color: #1e293b;
+            --accent-color: #f472b6;
+            --box-bg-color: rgba(30, 41, 59, 0.8);
+            --box-border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        #diodeSelector {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            background-color: var(--box-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+        }
+
+        .bento-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: var(--box-bg-color);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .bento-box {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .bento-box h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .bento-box p {
+            margin: 0;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .bento-box.large {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+            aspect-ratio: 16 / 9;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .datasheet-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .bento-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                padding: 2rem;
+            }
+
+            .bento-box.large {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5rem;
+                align-items: start;
+            }
+
+            .bento-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+            }
+
+            .image-container {
+                margin-top: 0;
+                aspect-ratio: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-background" id="starsContainer"></div>
+    <div class="container">
+        <h1>Diode</h1>
+        <select id="diodeSelector">
+            <option value="">Select a Diode Type</option>
+            <option value="rectifier">Rectifier Diode</option>
+            <option value="zener">Zener Diode</option>
+            <option value="schottky">Schottky Diode</option>
+            <option value="led">Light Emitting Diode (LED)</option>
+            <option value="varactor">Varactor Diode</option>
+            <option value="avalanche">Avalanche Diode</option>
+            <option value="tunnel">Tunnel Diode</option>
+            <option value="scr">Silicon Controlled Rectifiers (SCRs)</option>
+            <option value="gdt">Gas Discharge Tubes (GDTs)</option>
+        </select>
+        <div id="diodeInfo" class="bento-container" style="display: none;">
+            <div class="bento-box large">
+                <div>
+                    <h3>Overview & Technical Specifications</h3>
+                    <p id="description"></p>
+                    <ul id="specification"></ul>
+                </div>
+                <div class="image-container" id="componentImage"></div>
+            </div>
+            <div class="bento-box">
+                <h3>Applications</h3>
+                <p id="usage"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Industry Standards</h3>
+                <p id="standards"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Future Developments</h3>
+                <p id="futureScope"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Resources</h3>
+                <p>For detailed specifications, please refer to the datasheet:</p>
+                <a href="#" id="datasheetLink" class="datasheet-link" target="_blank" rel="noopener noreferrer">View Datasheet</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        const diodeData = {
+            rectifier: {
+                description: "Rectifier diodes are fundamental components in power electronics, designed to convert alternating current (AC) to direct current (DC). They allow current to flow in one direction while blocking it in the reverse direction, making them crucial in various power supply applications.",
+                usage: "Widely used in power supplies, voltage regulators, and AC to DC conversion circuits. They're essential in battery chargers, solar inverters, and many household electronics.",
+                specification: "• Forward voltage drop: 0.7-1.1V\n• Reverse breakdown voltage: 50-1000V\n• Max forward current: 1-3000A\n• Operating temperature: -55°C to 175°C",
+                standards: "Compliant with MIL-STD-750 and MIL-STD-883 standards for semiconductor device testing. Major manufacturers include Vishay, ON Semiconductor, and STMicroelectronics, adhering to strict quality control measures.",
+                futureScope: "Research is focused on developing high-efficiency, low-loss rectifier diodes. These advancements aim to improve power conversion in renewable energy systems and electric vehicles, contributing to more sustainable energy solutions.",
+                datasheetUrl: "https://drive.google.com/file/d/1BG1Pq8s0H2XHEI_sQULEOjwFVmg9aNwP/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            zener: {
+                description: "Zener diodes are unique semiconductor devices designed to allow current to flow backwards when a specific voltage is reached. This characteristic makes them invaluable in voltage regulation and protection circuits across various electronic applications.",
+                usage: "Primarily used for voltage regulation, overvoltage protection, and as voltage reference in circuits. They're crucial in stabilizing power supplies and protecting sensitive components from voltage spikes.",
+                specification: "• Zener voltage range: 1.8-200V\n• Power dissipation: 0.25-50W\n• Temperature coefficient: 0.01-0.1%/°C\n• Tolerance: ±1% to ±10%",
+                standards: "Adheres to JESD282B.01 standard for Zener voltage regulators. Key manufacturers like ON Semiconductor, Nexperia, and Micro Commercial Components ensure compliance with industry standards.",
+                futureScope: "Future developments focus on integrating Zener diodes in advanced power management ICs. This integration aims to enhance efficiency in smart grid technologies and IoT devices, contributing to more intelligent and energy-efficient systems.",
+                datasheetUrl: "https://drive.google.com/file/d/1aMKlZxH-nEO1Ic69O8jcpBlPQhmri62u/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            schottky: {
+                description: "Schottky diodes are distinguished by their use of a metal-semiconductor junction instead of a semiconductor-semiconductor junction. This unique structure results in lower forward voltage drop and faster switching speeds compared to conventional diodes.",
+                usage: "Extensively used in high-frequency applications, fast switching circuits, and as bypass diodes in solar panels. They're crucial in RF circuits, power supplies, and voltage clamping applications.",
+                specification: "• Forward voltage drop: 0.15-0.45V\n• Reverse voltage: 20-200V\n• Switching speed: <100ps\n• Operating temperature: -65°C to 175°C",
+                standards: "Complies with JESD282A standard for Schottky barrier diodes. Major producers like Infineon Technologies, STMicroelectronics, and Toshiba ensure high-quality manufacturing processes.",
+                futureScope: "Research is directed towards developing Schottky diodes with higher current ratings and even lower forward voltage drops. These improvements aim to enhance power conversion efficiency in data centers and electric vehicles, contributing to energy conservation efforts.",
+                datasheetUrl: "https://drive.google.com/file/d/1jdQ6StXEz-NzxaBB620VjCMlWD02-U6K/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            led: {
+                description: "Light Emitting Diodes (LEDs) are semiconductor devices that emit light when an electric current passes through them. They're known for their energy efficiency, long lifespan, and versatility in color options.",
+                usage: "Widely used in indicators, displays, lighting fixtures, and optical communication. LEDs have revolutionized the lighting industry and are crucial in creating energy-efficient illumination solutions.",
+                specification: "• Forward voltage: 1.8-3.3V (color dependent)\n• Typical current: 20-50mA\n• Luminous intensity: 1-100mcd\n• Lifespan: Up to 100,000 hours",
+                standards: "Complies with IES LM-80 and LM-84 standards for LED component testing. Key manufacturers like Cree, Osram, and Lumileds adhere to strict quality and performance standards.",
+                futureScope: "Future developments are focused on micro-LED technology for high-resolution displays and more efficient phosphor materials for white LEDs. These advancements aim to improve energy efficiency and color rendering in general lighting applications.",
+                datasheetUrl: "https://drive.google.com/file/d/13qNmA2FwaxuizVmbRC-_xsDBZdxB0z4C/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            varactor: {
+                description: "Varactor diodes, also known as varicap diodes, are specialized diodes that function as voltage-controlled capacitors. Their unique property of varying capacitance with applied reverse voltage makes them invaluable in tuned circuits and frequency modulation applications.",
+                usage: "Primarily used in frequency modulation circuits, voltage-controlled oscillators (VCOs), and automatic frequency control systems. They're crucial in radio and television tuners, as well as in mobile communication devices.",
+                specification: "• Voltage Rating: 5V to 100V\n• Capacitance Range: 1-500pF\n• Q Factor: 50-500 at 50MHz\n• Tuning Ratio: Typically 4:1 to 10:1",
+                standards: "Complies with MIL-PRF-19500 for semiconductor devices and IEC 60747-5 for discrete semiconductor devices. Leading manufacturers ensure adherence to these standards for consistent performance.",
+                futureScope: "Research is focused on integrating varactor diodes into 5G communication systems for improved signal tuning and performance. Developments aim to enhance frequency agility and reduce noise in RF and microwave applications.",
+                datasheetUrl: "https://drive.google.com/file/d/1R4pZVS0nhm-jXN4DwyGtfABmTn5gLqg_/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            avalanche: {
+                description: "Avalanche diodes are designed to operate in the breakdown region, utilizing the avalanche effect for precise voltage regulation and protection. They're capable of handling high reverse voltages and are crucial in overvoltage protection circuits.",
+                usage: "Primarily used for overvoltage protection in power circuits and voltage regulation in high-voltage systems. They're essential in surge protection devices and precision voltage reference applications.",
+                specification: "• Voltage Rating: 30V to 1500V\n• Current Rating: 1A to 30A\n• Response Time: <1ns\n• Temperature Coefficient: Typically <0.1%/°C",
+                standards: "Adheres to IEC 60747-2 for discrete semiconductor devices and MIL-STD-750 for test methods. Major manufacturers ensure compliance with these standards for reliability and performance.",
+                futureScope: "Development is focused on creating high-voltage avalanche diodes for more robust protection in power grids and  large-scale industrial applications. Research aims to improve energy handling capabilities and response times.",
+                datasheetUrl: "https://drive.google.com/file/d/12XsQpZf5yUnMc4qASv-R7qidULzAKzqX/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            tunnel: {
+                description: "Tunnel diodes, also known as Esaki diodes, operate on the principle of quantum tunneling. This unique characteristic allows for extremely fast switching capabilities and negative resistance regions, making them valuable in specific high-frequency applications.",
+                usage: "Used in high-speed oscillators, microwave amplifiers, and certain types of digital circuits. They're particularly valuable in ultra-high-frequency applications and some specialized computer memory designs.",
+                specification: "• Peak Current: 0.1mA to 100mA\n• Valley Current: 10-15% of peak current\n• Negative Resistance: -20 to -200 ohms\n• Switching Time: <100ps",
+                standards: "Complies with IEC 60747-2 for semiconductor devices and MIL-STD-750 for testing reliability. Specialized manufacturers adhere to these standards to ensure consistent performance.",
+                futureScope: "Research is exploring expanded use in high-speed switching applications and potential integration in quantum computing systems. The unique negative resistance properties of tunnel diodes may find new applications in advanced electronic circuits.",
+                datasheetUrl: "https://drive.google.com/file/d/1pIsODQ7PQ4A4AOvle9heDL7GI_-c5q-C/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            scr: {
+                description: "Silicon Controlled Rectifiers (SCRs) are four-layer solid-state current-controlling devices. They function as bistable switches, conducting when their gate receives a current pulse and continuing to conduct until the main current is stopped or reversed.",
+                usage: "Widely used in motor control systems, AC power regulation, and controlled rectification. SCRs are crucial in industrial automation, power transmission systems, and renewable energy converters.",
+                specification: "• Voltage Rating: 50V to 4000V\n• Current Rating: 5A to 2000A\n• Turn-on Time: 1-10µs\n• Holding Current: Typically 1-5% of rated current",
+                standards: "Adheres to IEC 60747-6 for thyristor devices and MIL-PRF-19500 for reliability standards. Major manufacturers ensure compliance with these standards for consistent performance.",
+                futureScope: "Future developments are focused on improving SCR performance for smart grid applications, electric vehicle charging systems, and high-power industrial automation. Research aims to enhance switching speeds and reduce power losses.",
+                datasheetUrl: "https://drive.google.com/file/d/1giuTg3qp89h30-h1Cqi2SRaEnnoRDpDG/view",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNDkp0xKbNXLi6aqEOuL_nG2DI6y_nIlIL6w&s"
+            },
+            gdt: {
+                description: "Gas Discharge Tubes (GDTs) are surge protection devices that use ionized gas to create a conductive path when voltage exceeds a certain threshold. They're capable of handling high surge currents and are self-restoring after a surge event.",
+                usage: "Primarily used for surge protection in telecommunications and power systems, as well as in lightning protection applications. GDTs are crucial in protecting sensitive electronic equipment from voltage spikes and transients.",
+                specification: "• Voltage Rating: 100V to 3000V\n• Surge Current Capacity: Up to 40kA\n• Response Time: <1µs\n• Insulation Resistance: >1GΩ",
+                standards: "Complies with IEC 61643-311 for surge protective devices and UL 1449 for safety and performance standards. Manufacturers adhere to these standards to ensure reliable protection capabilities.",
+                futureScope: "Research is focused on improving energy handling capabilities and response times of GDTs. Developments aim to meet the increasing demands of high-voltage power networks and advanced communication systems, particularly in 5G infrastructure.",
+                datasheetUrl: "https://drive.google.com/file/d/1icwHHiyR3pU46zGKoQbplr5pwdmoBwp3/view",
+                image: "data:image/jpeg;base64,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"
+            },
+        };
+
+        const diodeSelector = document.getElementById('diodeSelector');
+        const diodeInfo = document.getElementById('diodeInfo');
+
+        diodeSelector.addEventListener('change', function() {
+            const selectedDiode = this.value;
+            if (selectedDiode) {
+                const data = diodeData[selectedDiode];
+                document.getElementById('description').textContent = data.description;
+                document.getElementById('usage').textContent = data.usage;
+                const specList = data.specification.split('\n').map(spec => `<li>${spec.replace('• ', '')}</li>`).join('');
+                document.getElementById('specification').innerHTML = `<ul>${specList}</ul>`;
+                document.getElementById('standards').textContent = data.standards;
+                document.getElementById('futureScope').textContent = data.futureScope;
+                document.getElementById('datasheetLink').href = data.datasheetUrl;
+                document.getElementById('componentImage').innerHTML = `<img src="${data.image}" alt="${selectedDiode} Diode">`;
+                diodeInfo.style.display = 'grid';
+            } else {
+                diodeInfo.style.display = 'none';
+            }
+        });
+
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const starCount = 100;
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = star.style.height = `${Math.random() * 3}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                fragment.appendChild(star);
+            }
+
+            starsContainer.appendChild(fragment);
+        }
+
+        createStars();
+    </script>
+</body>
+</html>

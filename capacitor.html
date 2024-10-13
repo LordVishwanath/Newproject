@@ -1,0 +1,397 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Capacitor Information Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --primary-color: #3b82f6;
+            --secondary-color: #1e293b;
+            --accent-color: #f472b6;
+            --box-bg-color: rgba(30, 41, 59, 0.8);
+            --box-border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        #capacitorSelector {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            background-color: var(--box-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+        }
+
+        .bento-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: var(--box-bg-color);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .bento-box {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--box-border-color);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .bento-box h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .bento-box p, .bento-box ul {
+            margin: 0;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .bento-box ul {
+            padding-left: 1.2rem;
+        }
+
+        .bento-box.large {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .datasheet-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .bento-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                padding: 2rem;
+            }
+
+            .bento-box.large {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5rem;
+                align-items: start;
+            }
+
+            .image-container {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-background" id="starsContainer"></div>
+    <div class="container">
+        <h1>Capacitor</h1>
+        <select id="capacitorSelector">
+            <option value="">Select a Capacitor Type</option>
+            <option value="ceramic">Ceramic Capacitor</option>
+            <option value="electrolytic">Electrolytic Capacitor</option>
+            <option value="tantalum">Tantalum Capacitor</option>
+            <option value="film">Film Capacitor</option>
+            <option value="supercapacitor">Supercapacitor</option>
+            <option value="mica">Mica Capacitor</option>
+            <option value="polymer">Polymer Capacitor</option>
+        </select>
+        <div id="capacitorInfo" class="bento-container" style="display: none;">
+            <div class="bento-box large">
+                <div>
+                    <h3>Overview & Technical Specifications</h3>
+                    <p id="description"></p>
+                    <ul id="specification"></ul>
+                </div>
+                <div class="image-container" id="componentImage"></div>
+            </div>
+            <div class="bento-box">
+                <h3>Applications</h3>
+                <p id="usage"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Standards & Manufacturers</h3>
+                <p id="standards"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Advantages</h3>
+                <p id="advantages"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Disadvantages</h3>
+                <p id="disadvantages"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Future Developments</h3>
+                <p id="futureScope"></p>
+            </div>
+            <div class="bento-box">
+                <h3>Resources</h3>
+                <p>For detailed specifications, please refer to the datasheet:</p>
+                <a href="#" id="datasheetLink" class="datasheet-link" target="_blank" rel="noopener noreferrer">View Datasheet</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        const capacitorData = {
+            ceramic: {
+                description: "Ceramic capacitors are non-polarized capacitors made from ceramic materials. They offer high stability, low losses, and are suitable for high-frequency applications.",
+                usage: "Used in high-frequency applications, coupling and decoupling, and filtering in various electronic circuits.",
+                specification: [
+                    "Capacitance: 1pF to 100µF",
+                    "Voltage rating: 16V to 3000V",
+                    "Temperature coefficient: X7R, C0G/NP0, Y5V, etc.",
+                    "Frequency range: Up to GHz range",
+                    "Operating temperature: -55°C to +125°C"
+                ],
+                standards: "Complies with AEC-Q200 for automotive applications. Key manufacturers include Murata, Kemet, TDK, and Vishay.",
+                advantages: "Small size, low cost, high stability, suitable for high-frequency applications.",
+                disadvantages: "Limited capacitance range, potential for microphonics in some types.",
+                futureScope: "Development of higher capacitance MLCCs and research into new dielectric materials for improved performance.",
+                datasheet: "https://drive.google.com/file/d/1LE_CWhK2XRdUgac3pwoL9rOllsI96bCa/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            electrolytic: {
+                description: "Electrolytic capacitors are polarized capacitors that use an electrolyte as one of their plates. They offer high capacitance values in relatively small packages.",
+                usage: "Used in power supply circuits, filtering applications, and energy storage in various electronic devices.",
+                specification: [
+                    "Capacitance: 0.1µF to 100,000µF",
+                    "Voltage rating: 6.3V to 600V",
+                    "Temperature range: -55°C to +150°C",
+                    "ESR: 0.01Ω to 10Ω",
+                    "Lifetime: 1,000 to 10,000 hours at rated temperature"
+                ],
+                standards: "Meets IEC 60384-4 standards. Major producers include Nichicon, Panasonic, Rubycon, and Cornell Dubilier.",
+                advantages: "High capacitance values, good price-to-performance ratio, suitable for low-frequency applications.",
+                disadvantages: "Polarized (can't be reversed), limited lifespan, higher ESR compared to other types.",
+                futureScope: "Advancements in ultra-low ESR electrolytic capacitors and development of hybrid electrolytic-polymer capacitors.",
+                datasheet: "https://drive.google.com/file/d/1a3B1jgVKtDz9wPDAaBcmPYLK_FOnu5kX/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            tantalum: {
+                description: "Tantalum capacitors are electrolytic capacitors that use tantalum metal as the anode. They offer high capacitance in a small volume and excellent stability.",
+                usage: "Used in applications requiring high reliability and stability, such as aerospace, military, and medical devices.",
+                specification: [
+                    "Capacitance: 0.1µF to 1000µF",
+                    "Voltage rating: 2.5V to 50V",
+                    "Temperature range: -55°C to +125°C",
+                    "ESR: 0.01Ω to 3Ω",
+                    "Lifetime: Up to 10,000 hours at rated temperature"
+                ],
+                standards: "Complies with MIL-PRF-55365 for military applications. Key manufacturers include KEMET, AVX, and Vishay.",
+                advantages: "High volumetric efficiency, stable electrical parameters, long life, low ESR.",
+                disadvantages: "Higher cost, limited voltage range, sensitivity to voltage spikes.",
+                futureScope: "Research into tantalum alternatives and development of polymer tantalum capacitors for improved performance.",
+                datasheet: "https://drive.google.com/file/d/1XeS8hnRtk9H-FGpVuFkgKwByxmH2ZKjd/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            film: {
+                description: "Film capacitors are non-polarized capacitors made from plastic film dielectrics. They offer excellent stability and low losses.",
+                usage: "Used in power applications, timing circuits, signal coupling, and high-frequency applications.",
+                specification: [
+                    "Capacitance: 100pF to 100µF",
+                    "Voltage rating: 50V to 2000V",
+                    "Temperature range: -55°C to +125°C",
+                    "Frequency range: Up to MHz range",
+                    "Dissipation factor: <0.5%"
+                ],
+                standards: "Complies with IEC 60384-1. Major manufacturers include WIMA, EPCOS (TDK), and Kemet.",
+                advantages: "Low losses, high stability, self-healing properties, suitable for high-frequency applications.",
+                disadvantages: "Larger size compared to ceramic capacitors, limited capacitance range.",
+                futureScope: "Development of higher temperature film capacitors and research into biodegradable film materials.",
+                datasheet: "https://drive.google.com/file/d/1tFwBjQlm9G5PSFgjlWjSXUQ_8HWoCwft/view",
+                image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxITEhUTExMWFhUXGRUVFxgYGBgXFxgXGBcWFhUYGBcYHSggGBolHRUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGhAQGy0lHyUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTctLf/AABEIAOEA4QMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAADAAECBAUGBwj/xAA+EAABAwIDBAcGBQMDBQEAAAABAAIRAyEEMUEFElFhBhNScYGR0RQiU5KhsRYyQsHwYtLhFSPxB0RUcrJD/8QAGQEAAwEBAQAAAAAAAAAAAAAAAAECAwQF/8QAJxEAAgIABgIDAQADAQAAAAAAAAECEQMSEyExUQRBFCJhMmJxgQX/2gAMAwEAAhEDEQA/APaxiGdoeaRxLB+oeaoCoJyuqeMfNguaWPS2OmOAmzZ9tp9tvmEvbafbb5rmneCancxKy+VK6o1+IuzpximZ7w80vbKfbHmsSm/dkZ8k4M3haPyH0R8ddm17WztjzS9rZ2x5rA3eBTxe6n5Muh/GXZvHFs7Y80wxtPtt81itoTmo9SBJT15dC+PDs3Pbafbb5qQxLO0PNc+IkTmjExoj5D6D4y7Nn2pnaHmpOrtGbh5rnQ9FbVnNJeV+Dfi/puDEM7Q80jimdoeayW3TPpzyTePL0iNCPZrjEs7Q803tTO0PNYvVXVg4YEZpxxpv0DwYr2aRxbO2PNMMZTP62+ayWYQAy4zwRMSyRAAVasqug0Y3Vmr7Q3tDzTHEM7Q81kOJDQYhBdLyFL8hrahrx097N72hnaHml17e0FigxbNSDjKPkMPjrs2DiGdoeaXtDO0PNZEgKNSCIlPXYvjrs1/amdoeaf2lnaHmsRjICmHJfIfQ/jrs2PamdoeaSx94J0fIYfHQMVWzIKE4b0/RORNlCo3dyErlb7OtLoEaRRKdMcJSDpU+sjJQqW5bbqg9dkhpjJCFQflMgHVTpOuFYDGkZhbJZjBvLsynTbJMAiEUMgSLqRqgGPskXzkikO2NGozQXvJqNBtnIVgkDVVKbt6oeSPaBBalIAymcURoJTGnFlMkNMA2nJU+qGpPgpPcG3cQB3rG2l0vwtKQHb7uDbn6LJyhHk0jGc/5Ruh0ZSVDEYxrBLiGjmV53tHpxWdam0Uxxdd3kFzmKxVWtd7n1PPd8glqyf8AKo6sP/z295uj0PHdOsOwwwGof6cvMoGG/wCoFOffpPaOIh0eAMrzZ1U5ZJt9JOS5Z1/Bwaqj3LB7Xp1mh9MtcDqDP/BVtlexyC8R2NterhqnWUz/AOzT+V44HnzXqexttU8VT32G+Tmfqaefqt1iM83H8XTf4aeKrl0RCekQBndAZhpzJ7lbbSEWQk27Zg8qVEWuBOffxTvEZIfs15kypQ6biRxT3FsDqM5poRa7BooFxkAt7kso0x2OGqTuOiFV55pNkHlwKV+h17CbySj1g4JIsBVHkZoYqzkrNV4yjyVN7Q1TLb2VDcdpUw3jZC3hb90anUHckimWadC3EqJoF06IoqSIyPJD60i1xzzXQ1E57kTNFsAIZw8ZFLrx/m6ztobfw9Ef7lQToBmfALKeJBclwjN7Lc0erAsqzBDnZCPsuO2n/wBQDlRpx/U/0C5TaO3a1UnfqOM6A7o8gsnit/yjtw/BxJL7bHpu0elWGpWc8Od2WXP0XLbT6e1DIpMDBxcZPkFxwpvOTfDU+GZUcKGkkO/N+mbCeBU5ZS/pnZh+HhQ/S3j9r1ap/wByo5/KYb5BVmXaXTutBAsJub5eCLQa4uh7Ghkw6QGQNYdnKq16Rba+6cjoY1taU1FR4OhNcIlVp23gd4THAg5wQmq1t4NzkCOVsiFOiwmk6ATLmi3IOP7oNSkW5xPCZPjGSqh3fIbFukMccy2/OHEAnnAHkgBHZXJAhgJYDeN6BJMxkM81Gk7feA9xvaeE5eEo9gnRAqzsjadTDVRUpm4zGjhq0/yyquaQSDmLHvSIQmTOKkqZ7XsHa9PFUhUpmDk5pzadQVqheD7I2xUwtQVKZvk4fpc3g710XsvR/bNLFUhUYeTm6tdqCt4ys8TyMB4b/DVlMU3ikVZyjEIb6YKIXqDnD/Cl0UrE+m2Of1Q3NBUgRM5KWql7lLYbqmpIlkk6RNlTDu3m53/nBTNBpMulAwTCJ05K8yp7sEIj2ypOnsOMGyJAngliMK3dnKyg7GBjSTouE2njMRjqjqdOoKbGgGJIJBtoJP8AlOc0/pBWy8Dx54jtukvZ0+J25haJl9Vs8Ab+S53aXT5knqKZd/U6w+tyuM25sPEYYy+7Tk4XB8dFlGoSuZvE4k6/0erh+Dg/1dm9tPpPia35qhA7LPdHnmsV9b/nXzQZTSkoJHXFKKpItPpARvOIJANhMA5TcKDKm44FpBjkYPndTa9r2hrjDhZrjkRnuu4cj5pmYN+8Jad2RJtuxr72Sqtwvsm+iwgvDjuzcZuBOhPDgVOru1XWkOgQDBDoHHRxjxVZtTced24ki9w5vAjgQp1Kjm5M3J1gyRyLv2RYqJGqHgB5hwEB0EyODo+hUXVWhhY0kyQZNgInIeOajSobzTun3hJ3eI4t4nkjbPqw2pYGzTByIDhPdnmig2QOjSO7JdutJjvIz90G8Sp4amGuDjBZcb2YBIMSDlGcHgjdT7hz6o3Djmx2V+PhnnoqzQ6m7KQbcWvHDn9wnW5NhTVLXQ8QR+pgDXDmIgOH8lKsGk+/Am4e0WcOJb6X5FDxNVrSWOu0H3T+oDhzHIqpiMa3dDRJgkyY1iw5WSsC/jWWa+17EgyCRr4iPEFUX1wFn1cacpVSpik1FsLpF6riVudD9tvw9XfaZEgPb2m+o0K441iVr7JYRJOtlrCFHNjtONH0BhMYKjWvaQWuEgjgrAqLz3oJtmCaDjnJZPHUeOa7fr+KHseXKNMvNfZQLjmgNeIhN1hngk2Soh+si6U5ElNM5pWiJSQBN8ckkGBxKSdhSCYeoDcKb3QJKE1vDJFqRCpvYXsz9pu3qTyOyVwFao9rxVpGKjNNCP3C9Fx0dW7uP2XnOIsZC57qZ6Xhv6tHX7I2pRxtItc0TEPYbxzHFq4PpV0ZfhnbzQXUjkezyPqjy9rhWondqNuQNeNtQdQu42LtOljKJa4CYipTN45ji08V00sVf5Fu/GeaO8Xyujx0hNK6Xpb0adhXbzQTSdkeyToeS5shc9U6Z3RkpRzR4EFZOHaGtLifeuA0T5k68lJmIa9rWOAbAhrhx/q4g/RDFV9OW5cuB4jhbUIFdhMO7cNwWhwgO3bt5ifqo1RTm7nOOrhEeG9c/RKk2oIsSDBi5a4fzXRDrPptc5pkibEG8d2RQTe4RuGgiHC4ljspI0/pPeive4Avu14919rOnWDra/gVmYnaAgNaLAk3zkwD3ZBUa2PJEFxjhNk+eBX2ap2gWkknekQQbgjgqL8eRk4gcjCy6mJQwXOykq1hv2S5pFupiuarvrkotLZ7j+Yx9SrlHDMbpJ4larDSMZY6RnUqD35DxNgrdPZw/UZ5BWy9AqVxxV0kc7xWwlOm1uQCKyqqJquiwA5n0QKhdxPnCLM22zo8FjN0hwMEEGeC9S2btDrabXxmL8jrC8LwWHqVHta2XGcgbeJOi9y2NXFdraZY2jig0TSECnVAH5qRyB5IcMy/TDFmompTrWEKTHcfIqtTdBi7SLEHOeCLvSsGqEnZdaQdfBSaCqjSf5KtUnIypiboJf8AkJJSkjILMFPBDaNCjboKFUPvBOhJkawlrhyIXnOJEEjhZelA8RdcT0kwJZUJH5XX8dVlONSs7fEnTcTCBIMhOC+k8YigYcPzDQjUEatPBO8J6VWCmnR6Kd7M7jZ+No42gZAII3XsP6Tw7uBXAdJei7sO4uZ71P6t5HiOasUMW7DVevpyWmzm6EcI+x0XR7d25hzhpc61Rp3QBJM/YrXElGUMz5OeEJ4M6jvFnlr4CapjRugG5GR4DgeIWZi8aZKovrlZRg2jqm0uTUqbQMQCQO9U3YgnJCpYZ7uQ4lWqGCaMyT9AtY4SOeeOlwUTUJRGYR50jvWi1rW5ABMai0ypGEsZsBTwLRnc/RWWwMhHcg1KsaqtUxY/4TsybbLzqqC/EKnvuOVkzWAXNylYUH62eP2CUoLqqGaqVg0WTUCF1kqFKk55gAldHsXY7QQahnkMvFOuzOU0jX6G4DcaahHvOsOO6urEOiZBBlpBhzSMiDoVl0nK1Tq8Em97OduzrcBjG4kCnVIbiAPcqZCrGhGjuXkouYWO3XWIzHosGi+YHjwvoQdCumwOPbXaKVcxUFqdXtcA7n91VqfPJk7hxwMx/BFY/LNAq0XU3brxBHkRxCnTeVk1XJqnZc3klV3jxSSsMpqCoO7vTuaDfgkH34qDmDOCtESTqGcln7SwYqMLHd4PA6FXhiBqoOdOiUoqQ4ycTzvHYM03brrfzNZ7m3svQdrbPFVtxcZHguLxWFcxxDgsZRo9TAx1JfpUY/MHI2XJ7epuY7dk7uY7iupqtWH0mbLAYuJH7qPaZ3QkcfiLKxgGticz9lVxDiY5WRcAYBOi7I8HBjydmm56G+pGZVJ+IJs0eKj1BOZRZjQapiwOaC6u45KQpgKDqqVjoYUicypgAKu6snZSc7IIpickgj6yFvkqzSwHEq0ygG6J1RjLG6KLcM602Cs0MGeEjirwwxMDTgr1KhFgkYubZWw9B4GQ81fw4dwjuU2UzlHl6K7h6aQi5hgSAZV6lMKGBw9oWlRwyGIHQJGa0cOZsnp4VWG0SEuBm3gsa2o0Uqx5NqatOgdy5qFfDOpu3XeB0I5KhQ5rVweJEdXVuw5HVndyWiamqZk04borbp5JK9/pFP8A8j/5SRpBrIsA2TF2mihSxQdrfglN7arKzWuxn0mjRRYy1iVJzeaLRGqIvcfoFuwsna2zBUE23gt3cmUEMCtwzExm4u0eaYyiWmCMljbSw280jivRukGyg9pcLOGXovPMc9zTBEQueUKdM9bB8jMrOGxWHIlsZFGfhAGNE5gFdJh8Xh+tpuqslrXtLhYy0EEiNZyhd/046H0cdQbi8Fuk7sw2wc3kNCOC3inp2jHyMeGdfp4vYZITqytO2fUkgiIsZ0RaWzR3oqzOWLFGXJOQRG4FxubLbp4a0QmcRkBdPZGDxZPgoUcCBorjcMiDCO1PdwVihgScyTw/nBO7MmCFKBkoYajvunQLSpbPcTBuFo4fZ8AwEgM2lQnJaNDCclp4HZo3Vq0MCOCAMTD4CVoU9njgtdmFgWHqrjMPbJIDNw+CiIsFo0sOBp6I7MOdBPJWqdLRAAGUTmi9Tx8CrTMPwTPqsaJJmNMlSXZLZVdSjNDfiw0ZiP5kqe0NqCfd/wAeHFZNWqTclSkVZrf6i3ifIJ1h7x4pJ5RWeitqGbBvkpE8oKJup4snT9k2gG6pBqKmahRCxmtWfj3btgbFaZKz9oUpISxF9disN/bczXYabk56ysPbOxt8ExPMfm/yup6iBIz+nkhVqMjSVlSNlJo8k2h0dLTaVvdCNuuwLtx0mi4+82Zg9ps68tV1e0Nn7wuFz2N2NckfVNYjgEo51TNrpp0UZiGe14WHbw3nBuTh2hz5LzapQg8/5mF3/Rba9TCO3H3ouzHZPFv7haXSrosyoPacOAd73nAajtN58lq6ks0TDeDyy/4zyurTgWzPFPh9nmLi+q6EbNk5WHJXqWzuSlFvY5ujgHRx+hV6jhQBcEcF0VLZ6KzAguAjK6YkZWBwfJaPsNu9arcENR4ojMLcRlrN/qhgV6eCEI9DDx/PsrtGidR5QrNNg0VVuTZTp4bWEduGhWQzgpFsXJTomwLKc5BRrEDPNQxW0xT1hc9i9pOdrA+pSdeho0sZtMCwvy9SsOvinON8uAyQnun7oZKVDsclQc5RcZTJgKU6jKSYj1IJBFITFqKIsEpsKluJgEU0Fji6DWaHBEflZQNxZN7qgWzKbaICGXRIV/dlAdh+IWEoP0bqfZUMmxVSrg5MwPt3LUhVq7JH7LOapGkWYeJwIF5Vzo9tQ0jumTTJgzoeIVptDvVephxfj3JRk4O0OSU1TLG29jBv+9Ruw3e0af1NH3Cz6dJuYuCtfZO0Sz3Tdndl3I2P2YGzUpfkddzRp/U39wumlL7ROa3B5ZGQyhwaT9Pup4bC5mLrRZTBAIMjTmidUIQkNyKjaQGaMxgGnijNpnip7ipIlsG0DMJPZMHJPUqBuayNobXAkNv9kNoEjRrYxrRMjvWDjNrk2b5n9gs2viXOPvGyrOqFLd8j4J1qpMknNCKYuUHFAEi7gokpSolyYDlM5yi5yE9yAC7ySBvJ0UI9ev4KShvJ07IHTuySlCr1ALGEN0CRKLWUWgINzkp07IzDykwLpyJS0UYSYyvUF0Kb3CtObeyg9ozGawcWaqRXezgFDqwZGisGnIupPZYQEspWYz20xJAVzA4wsdun8pzH7hMaOqG5nO6Uc0XaHLLJUy1i8Lu/7lO7DdzRpxc0fcKLXSAW3BU8HXc3PLn+yfE4fdBqUhLTdzR9S30XVyrRy7xdMi4gXIhZuO2s1nfwWXtHazjIEj7rIc8lTbfBpVclnG7Re7Xw9eKpB89yciLoMoSoCT3f8ocqQCg4pgKpHioynJUSUALfQ3uTOchPcgB3vQ6hUalYNu493M8uKysRiXPPAfdJiNPeSWV1XL7pIA94YRkU5KCXibKQcDyKSdg0FBsSFUxBBglHdVItCq1Te3kpmyoIM0ZSpKDblTaqSEyQfCJvjVRKGANU90Kkw28FCo0nKyI0BNuc03uieAQbrKiGOOoI8UeCg1Xht5jkpaSKTYz6R5BVqrmsublV8ftlosM1zuN2i56VL0Uv00cZtY6een+U2yNvOpv94lzDmOHMLAdUJSmyuP1FKmqOx25sdtVvXUIMiSBrzHPkuQday1dg7bdQdBvTOY4cxzWxtzYzKzeuoQZuQNe7nyVNe0Zp06Zxz3ISLUaQTMoMKSxz/AouGqYnVQe5ADOcoOeFBzvJU8TigOZ4IAsvrDVZ9fHaMvz9ECpvOufJGpULIFYMNJMuvwRmUdUanSR2U/qhgV9zuSV7q+adLcVHqdRt4RKaC/kp0gRmoi9zRrYVQiZlVqTg65z4olZwGeqFQCm9ylsi0BZSYxNTMKYC2Rm2TDYUSeSkm3U2iUxkzXkZoNfFsZmue2lt4mQ1RfRSRv4zabGDO65fHbYc+QLD6rLrYlzjcygo5e41S4CuqEqDnKMqJcmBMFMXKKiQmBMPutfYW3HUHRmw5t/ccCsMlD6xNOiWrVM7zbex2Yhgr0IM3IGvoVxNUQYIiJstDYG33Yd/Fh/MP3HNdJtvY9PF0+vw5G8RcDXiDwcm17RKdbM4VzlXrYgAST/OSr7QrOY4s3feFjIy8NVR3C6CSSf5kpstk62Kc7Kw+v8AhQbRRm0lYZTQIDTpKyympsYEdlLRAMHTplHYwaHWERlK/wBFYp0+SYgPV8kla3P5CSBnf080SqQtFuFYP0/dMcIw/p+6awpVRDxk3ZjYhoJSp0oC2PY2dn6n1TjCs4fdSvHd2VrqqMtqn3LSOFZw+6XszeH3VaTJ1UZxeBclY+0tvNbZtzy9V0dXZlJ2bfq79iqx6OYU/wD5D5neqenINWJ5/i8c55klVHOXpP4awnwR8zvVI9GcJ8EfM71RpMNZHmhUYXpv4awnwR8zvVL8M4T4I+Z3qnpsNVHmcpSvTPwzhPgj5neqX4ZwnwR8zvVGmxaqPM3lCc5eoHoxhPgj5n+qb8LYP4I+Z/8AcjTYaqPKi9DL+a9YPRTBfAHzP/uUfwjgvgD5n/3I02GqjyGvig3meC0ejXSarh6k50z+Zv7jgV6QOhOz/wDx2/M/+5THQ3Aj/tx8z/7k1BpieInscX0vxOExJDqcipub7pEAiYg81yjKK9g/CGBz6gcPzPy+ZS/CeC+APmf/AHJabDUVHkjaeSJTp/zkvWB0UwfwR8z/AO5SHRjCfBHzP9UabHqo8spUrqyxmS9LHRnCfBHm71Uh0dwvwh5u9UabFqI88bQgqxTp2XejYGG+GPN3qpDYeH+GPN3qnpsNRHB9UeASXe/6Jh/hjzPqknkDURoJJJLQxEkkkgBJJJIASSSSAEkkkgBJJJIASSSSAEkkkgBJJJIASSSSAEkkkgBJJJIASSSSAEkkkgBJJJIA/9k="
+            },
+            supercapacitor: {
+                description: "Supercapacitors, also known as ultracapacitors, are high-capacity electrochemical capacitors with capacitance values much higher than other capacitor types.",
+                usage: "Used in energy storage, power delivery for electric vehicles, renewable energy systems, and backup power supplies.",
+                specification: [
+                    "Capacitance: 1F to 3000F",
+                    "Voltage rating: 2.3V to 5.5V (single cell)",
+                    "Energy density: 1-10 Wh/kg",
+                    "Power density: Up to 10,000 W/kg",
+                    "Cycle life: >500,000 cycles"
+                ],
+                standards: "Complies with IEC 62391 standards. Key manufacturers include Maxwell Technologies, Panasonic, and Skeleton Technologies.",
+                advantages: "Very high capacitance, rapid charge/discharge, long cycle life, high power density.",
+                disadvantages: "Lower energy density compared to batteries, higher self-discharge rate, voltage balancing required for series connection.",
+                futureScope: "Research into new electrode materials, development of hybrid supercapacitor-battery systems, and miniaturization for consumer electronics.",
+                datasheet:  "https://drive.google.com/file/d/16V-wzImuUCNZgBbk8lOQRvwKLYlOJ0Hi/view",
+                image: "data:image/jpeg;base64,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"
+            },
+           
+            mica: {
+                description: "Mica capacitors use mica as the dielectric. They offer excellent stability, low losses, and high-frequency performance.",
+                usage: "Used in high-frequency circuits, RF applications, and precision timing circuits.",
+                specification: [
+                    "Capacitance: 1pF to 0.1µF",
+                    "Voltage rating: 100V to 2500V",
+                    "Temperature coefficient: ±50 ppm/°C",
+                    "Frequency range: Up to GHz range",
+                    "Q factor: >1000 at 1MHz"
+                ],
+                standards: "Meets MIL-PRF-39001 for military applications. Manufacturers include Cornell Dubilier, Vishay, and AVX.",
+                advantages: "Excellent stability, low losses, high Q factor, suitable for high-frequency applications.",
+                disadvantages: "Higher cost, limited capacitance range, larger size compared to ceramic capacitors.",
+                futureScope: "Research into synthetic mica materials and development of mica capacitors for extreme environment applications.",
+                datasheet: "https://drive.google.com/file/d/181MkBNKZ6gFoKkWGunRFWQcQlVlsObCC/view",
+                image: "data:image/jpeg;base64,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"
+            },
+            polymer: {
+                description: "Polymer capacitors use a solid organic polymer as the electrolyte. They combine the high capacitance of electrolytic capacitors with the reliability of film capacitors.",
+                usage: "Used in power supply decoupling, DC-DC converters, and high-reliability applications in automotive and industrial electronics.",
+                specification: [
+                    "Capacitance: 2.2µF to 1000µF",
+                    "Voltage rating: 2.5V to 100V",
+                    "ESR: As low as 3mΩ",
+                    "Temperature range: -55°C to +125°C",
+                    "Lifetime: >10,000 hours at rated temperature"
+                ],
+                standards: "Meets AEC-Q200 for automotive applications. Key manufacturers include Panasonic, KEMET, and Vishay.",
+                advantages: "Very low ESR, high ripple current capability, long life, stable electrical parameters.",
+                disadvantages: "Higher cost compared to standard electrolytic capacitors, limited voltage range.",
+                futureScope: "Development of higher voltage polymer capacitors and research into new polymer materials for improved performance.",
+                datasheet: "https://drive.google.com/file/d/1RA-qietrFDFmV1mH3XOKkjsJKShzbl5B/view",
+                image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAREhUSEhITEBUTEhESFRcVDhAQFRsVFhUXGBUXFxUYHighHhomGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDQ0OFxAQFTcdHR0rKysrKy0rLSstLSstKysrLSstKy03Ky03Ky0rKy0tNzctLS0tKysrKystNystKysrK//AABEIALUBFwMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAAAQUDBAYHAgj/xABDEAACAgADBAYGBwUGBwAAAAAAAQIDBBEhBQYSMRNBUWFxgSIyNIKRsgcUUmKhscEII0LR8BUzcpLh8WNkdJOis8L/xAAXAQEBAQEAAAAAAAAAAAAAAAAAAQID/8QAGBEBAQEBAQAAAAAAAAAAAAAAAAERAjH/2gAMAwEAAhEDEQA/APcQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFdvD7PP3PniBvD7PP3PniALEEACQQAJBAAkEACQQAJBAAkEACQQAJBAAkEACQQAJBAAkEACQQAJBAAkEACQQAK/eH2efufPEEbwezz9z54gCxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV28Hs8/c+eIG8Hs8/c+eIAsQAAAAAAAAAAAAAAAAAAAIc1yz58gJAIlJLV6ASCrxe3aYaJ8b7I6/jyKXF7dunpHKtd2efmwOptxEI+tKMfGSRFWKrl6s4y8JxZw0rZ8+Jo+Prkv44xmu+OT+K1A9CByOA2nYtapOxLV1TlnLL7kjo9nbQrujxQfLRp6ST7GgNsGLEYiFa4pyUV2t5FVZtmdj4cNW5/fkuGPw/2AuLLIxTcmopc23kiov26m+GiDtl25NR+PWfNexZ2PixFjsfPhTyivJFvRh4QWUYqK7kBW4DDYlzVl1uX3I+r5lsCrxe3KovhhnbLshqvOXIC0MEcZW59Gpxcss8k82VKw2Lv/vJdDB/wxbUsu98yxwGzKqfUjr2vVgbgAArt4PZ5+588QN4PZ5+588QBYgAAAAABr4nG1V+vNLu5v4IDYBSX7dz/ALuPnL+RVYjF22etN+C9FfBE0dNftCqHOSz7Eaz2xFLPo7Mu1KM158LZy04o13xwfFBtPueT+JNHeYPHVWrOElLtXJrxT1Ng4XDXq1p59FcvVmsoqT+zJck+8usFvA2uCVcpXR0cUslp1llHQGni9p016Sms+xav4I0XRi7vXkqIvqj63x/rwNnZ+xqadUuKX2pav+SKNb61ib1nVFVRf8Uufil/p5lXtvaeB2YldjcQ3Y/UXpSnJ/crWbfjyLDe/eenZ+Gsvm1KUI+hDPWU3pCPdm+vszPzFfj7sdjYXYmbsstvpTfUk7IpRguqKzySA/ReI3wm1+7pcNM85+lJe7HTPzZWLHWYl5SvTk+UJN1/BPQ3rIJ/7HxbgYTWUop+RNVing5weU4uPZr+XaDPhsVZSlGWd1PXGWso98Xz07DLjsOopTg+KuSzi/0feVGjIw2QMrmjBZIgwcTg84vLJ56Pl4G9Xj5r99U+GxLKxJLKSfKWX9ZMr7WYqL+jln1LR98XzQHc7O2XXao3WTle5JNOTeXhl+hdQgorJJJdyyRyu6e0I19LTOSUYPpINtJcMuaX4PzLK7bbm+HD1ux8uJpqPw5v8Ci4nNJZtpJc23kipxG3Y58NMXdLu0j8evyMcNj2WvixFjn18K0ivItsPhoVrKEVFdyAqFs7EX632cMfsQ0Xn/rmWmEwNVSyhFLvy1+JsgAAAAAArt4PZ5+588QN4PZ5+588QBYgAAVe8m3aMBh54m+XDCC6tW5P1YxXW29C0PAf2jNtyliKMEn6FdfTz7HOblGPwin/AJywdpupvNiNrU2Yhy+r19NOuFcHqoxjF+nPTNvPwLGOz5xeacLOtqccs/eWpwn0SbWhhtk3XTVko14m1yVdUrZJdFXJvKPJd70Wep39W18O5Qh0iU7a67IRaefDZnwZvLJN5SyTevC8szn1srczG3ha65vhinVYv4JPNPvhLr8D5nXlo1kzJfQpLXRpppp5NPqaZFt7sg+LSyvLi0y4ovlNfkxLqWNG1GCbMk7dDVsepm1GtiNHn8fA3o45rgxC9euShZ95Zei/NZryNC6RGEg/Tj1Ot/GPpL8mWI7u3bdeX7tStbSyUV29/wDLMwQrxd79NqiHZH1n+v8AXIzbsxX1et5JPJpvLXRtfoWp0HhX07uFLw2GhnqrL5tvNt58EP8A7PNNgrPFYb/qcN/7Ynf/ALQCf9oVdn1OvL/u25nC7rVcWMwy/wCYqeunKafX4Ae14jGYmO0aqHKt0W1X2JRrasTrUF6Um2nrLTLLnr2nxuzvQ8XKcVXBRhKxcUMVVY0ozcY8dek4uWWa0a7ypw+3UsTndU54mGMuwNSjNw/cz4LHY081pBRb8O8bJnGWNi7MTKMqasTGFV2FnTc4TkpNzsb4bIR4dJLs11zZFdbXjIWylGE4S6P18pRlwvsaXJmxg7IpOEnlXbz+7PqkvPmeb7q4Syu/C1wrlCddeMhjJdFKMJJzUq855ZTznqmm9D0dVpxy7guK7EJxbT5p5MwTkfeJb6TJ83H8Y6Z/DIxuJMZYpMwuDZsxgTCHMo29gUxnfUprNShKD1y9XPL8keg1VRisopJdiOG3Zqbvr+70kvwa/M7woAAAAAAAAAACu3g9nn7nzxA3g9nn7nzxAFiAAB+Yvp3T/te3Prqoa8OBfrmfp08E/aO2M434fGJejOt4eT7JQblH4qUv8pZ6Mf0TSz2bdS9IYrF24Vyyz4HbhVlNrPVZpRy7ZIuLKYTWHddqjXiKdm18dtdtWmGvdlTrlGLg52cuByTWcXrnkcz9H+IqhsjERtdsVZjYxjOro+KE1VCyM/TlGOS6N9evJas72iGFnfVKnE1tYaivgptqfBXDgi3ZB8UVG3o5QzclJxUlok9c9erGlupTdDF+rLJvHyxVizdc+K5SwuVvKUlDiWXOKTTyyR2ONzXpLqTT74vmio3V2BHDRc3ONspu5pxjVkoztlNZTUVJ6Nc29eRfSTayfNf1mYtbkc/TLNfFeaeRMoFl9WS5L+JmKdRExXyqMkIZNv7svxWX6mWTiubSS556FlsTAO58ck1DPr0zy5JdxuRlf7GpcKYRf2c/i8/1N0A0jxb9ojZzzwuJS0ysok+/ScPymeabjQ4toYWP/Gj+Cb/Q/SP0g7vf2hgbaElx5dJU31Ww1j5Pl4M/PP0e0SW1MPFppwst4k1qnGuxNPwYHeYKzAvHW4vpbKcoWpxvqjGpuEoU22xbfVwRi08nqY3sDE1V4xyjHE3X0WxjfC30nxR9CpUyXoR104ZPPLUnaG4MoKxUzhKM6p1uLr4LZqy+NkuktzyeSTSeSbWSZW4uvFYd2yssdCrugoydtlKtrpwso1JWqLSb0eUlk3HLuCuv3e2P9XXD6Hq1pdHG2uGWTebqlJqM9dXHLPTkdBCOhV7Du6SmmzilLjw9Es5JKT4oJ5vh0z8C1gG5408VRnOMsuTa8mfE6tWWM9cvE17UtQw0FDUKOSbfgvE+7bEl2vsSzfwRZbH2Hba1O6LqrWqi9Jy75LqXdzCN/dPAtJ2vrXDHw635s6M+YQUUklkloj6AAAAAAAAAAACu3g9nn7nzxA3g9nn7nzxAFiAABQb87tw2jg7cNLJOS4q5ZerZHWEvDPR9zZfgDwn6LN3c8PisNiYyrsw+M6slKM+hcG1xJppxlLmmmpZ9hf47dnJKqFspVRUnwT4nKU3h/q/pXRknwuCTa4c89c8tD0THbLi5StgkrJKKl1KSjnw596z5+RS2tReU0632TSXwfJ+Rjq3W+cVe69cqaXXZGFb6W2UVBxa4JSbjxSjGKcsuby18dS+rj19XLyK+qmCzlOcUv8aSNuXS3LgojlB87JaRy+71y8tCSa1ciLsRFLNtdb6uXJGvhsNde/QjlH7UtI+Xb5F1gthVw9Kf72XevRXhH+eZbo1OXPVPhN3qotSn+9ktdfVz/wAPL45lwkAaQAAA822/uQqtp1bRoWUJuxXxWiU5VySsXdJ6PvafWz0kiUU1k9UwOLnPtNfF1xnFxaUk9GmlJNd6Z0mN2T1wWa+y3r5P+ZTywUU9c4vv9F/iRvY0MKmlHJZLhy5csm8l8Giwg8lmzHwRrWso9enEs/JGxRgrrllBdFH7c4v/AMY83+CKlrUuxaT58tPM2MHsa+7WX7qHenxvwj1eZebM2JTRk0nOf25ZN+S5LyLMMtLZ+y6qfUjr1yesn5/yN0AAAAAAAAAAAAAAArt4PZ5+588QN4PZ5+588QBYgAAAAB8ygno1mu/U+gBrRwFKeaqrT7VXBP8AI2EiQAAAAAAAAAAAAiUU+epIAwwwtaeahBPtUIp/EzAAAAAAAAAAAAAAAAAAAABXbwezz9z54gbwezz9z54gCxBIAgEgCASAIBIAgEgCASAIBIAgEgCASAIBIAgEgCASAIBIAgEgCASAIBIAgEgCt3g9nn7nzxBO8Ps8/c+eIAsQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFdvD7PP3PniBvD7PP3PniALEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABXbw+zz9z54gAD//2Q=="
+            }
+        };
+
+        const capacitorSelector = document.getElementById('capacitorSelector');
+        const capacitorInfo = document.getElementById('capacitorInfo');
+
+        capacitorSelector.addEventListener('change', function() {
+            const selectedCapacitor = capacitorSelector.value;
+            if (selectedCapacitor) {
+                const data = capacitorData[selectedCapacitor];
+                document.getElementById('description').textContent = data.description;
+                document.getElementById('usage').textContent = data.usage;
+                document.getElementById('specification').innerHTML = data.specification.map(spec => `<li>${spec}</li>`).join('');
+                document.getElementById('standards').textContent = data.standards;
+                document.getElementById('advantages').textContent = data.advantages;
+                document.getElementById('disadvantages').textContent = data.disadvantages;
+                document.getElementById('futureScope').textContent = data.futureScope;
+                document.getElementById('componentImage').innerHTML = `<img src="${data.image}" alt="${selectedCapacitor} Capacitor">`;
+                document.getElementById('datasheetLink').href = data.datasheet;
+                capacitorInfo.style.display = 'grid';
+            } else {
+                capacitorInfo.style.display = 'none';
+            }
+        });
+
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const starCount = 100;
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = star.style.height = `${Math.random() * 3}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                fragment.appendChild(star);
+            }
+
+            starsContainer.appendChild(fragment);
+        }
+
+        createStars();
+    </script>
+</body>
+</html>
